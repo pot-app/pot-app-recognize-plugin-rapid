@@ -68,7 +68,7 @@ pub fn recognize(
             "--boxScoreThresh",
             "0.5",
             "--boxThresh",
-            "0.3",
+            "0.5",
             "--unClipRatio",
             "1.6",
             "--doAngle",
