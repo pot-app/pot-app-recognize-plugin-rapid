@@ -3,6 +3,9 @@ use num_cpus::get;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+use std::process::Command;
 
 #[no_mangle]
 pub fn recognize(
@@ -31,7 +34,17 @@ pub fn recognize(
         .join("com.pot-app.desktop")
         .join("pot_screenshot_cut.png");
     let thread_num = get();
-    let output = std::process::Command::new(&rapid_exe_path)
+
+    #[cfg(target_os = "windows")]
+    let mut cmd = Command::new("cmd");
+    #[cfg(target_os = "windows")]
+    let cmd = cmd.creation_flags(0x08000000);
+    #[cfg(target_os = "windows")]
+    let cmd = cmd.args(["/c", &rapid_exe_path.to_str().unwrap()]);
+    #[cfg(not(target_os = "windows"))]
+    let mut cmd = Command::new(&rapid_exe_path);
+
+    let output = cmd
         .current_dir(plugin_path)
         .args([
             "--models",
@@ -64,10 +77,17 @@ pub fn recognize(
             "1",
         ])
         .output()?;
+
     let result = String::from_utf8_lossy(&output.stdout);
+    #[cfg(not(target_os = "windows"))]
     let list = result.split("=====End detect=====\n");
+    #[cfg(target_os = "windows")]
+    let list = result.split("=====End detect=====\r\n");
     let result = list.last().unwrap();
+    #[cfg(not(target_os = "windows"))]
     let list = result.split("s)\n");
+    #[cfg(target_os = "windows")]
+    let list = result.split("s)\r\n");
     let result = list.last().unwrap();
     Ok(Value::String(result.to_string()))
 }
