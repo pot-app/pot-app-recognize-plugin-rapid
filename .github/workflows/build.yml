@@ -28,11 +28,10 @@ jobs:
       fail-fast: false
       matrix:
         platform: [windows-latest]
-        target:
-          [
+        target: [
             x86_64-pc-windows-msvc,
             i686-pc-windows-msvc,
-            aarch64-pc-windows-msvc,
+            # aarch64-pc-windows-msvc,
           ]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -49,10 +48,12 @@ jobs:
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
       - name: Rename
-        run: move target/${{ matrix.target }}/release/plugin.dll ./plugin.dll
+        run: |
+          move target/${{ matrix.target }}/release/plugin.dll ./plugin.dll
+          move ${{ matrix.target }}/RapidOcrOnnx.exe ./RapidOcrOnnx.exe
       - uses: vimtor/action-zip@v1
         with:
-          files: info.json ${{needs.check.outputs.icon}} plugin.dll
+          files: info.json ${{needs.check.outputs.icon}} plugin.dll models RapidOcrOnnx.exe
           dest: ${{needs.check.outputs.name}}.potext
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
@@ -94,10 +95,12 @@ jobs:
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
       - name: Rename
-        run: sudo mv target/${{ matrix.target }}/release/libplugin.dylib ./plugin.dylib
+        run: |
+          sudo mv target/${{ matrix.target }}/release/libplugin.dylib ./plugin.dylib
+          sudo mv apple-darwin/RapidOcrOnnx ./RapidOcrOnnx
       - uses: vimtor/action-zip@v1
         with:
-          files: info.json ${{needs.check.outputs.icon}} plugin.dylib
+          files: info.json ${{needs.check.outputs.icon}} plugin.dylib models RapidOcrOnnx
           dest: ${{needs.check.outputs.name}}.potext
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
@@ -123,12 +126,11 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest]
-        target:
-          [
+        target: [
             x86_64-unknown-linux-gnu,
-            i686-unknown-linux-gnu,
-            aarch64-unknown-linux-gnu,
-            armv7-unknown-linux-gnueabihf,
+            # i686-unknown-linux-gnu,
+            # aarch64-unknown-linux-gnu,
+            # armv7-unknown-linux-gnueabihf,
           ]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -141,9 +143,12 @@ jobs:
         with:
           target: ${{ matrix.target }}
           toolchain: stable-${{ matrix.target }}
+      - name: Move
+        run: |
+          sudo mv x86_64-unknown-linux-gnu/RapidOcrOnnx ./RapidOcrOnnx
       - uses: vimtor/action-zip@v1
         with:
-          files: info.json ${{needs.check.outputs.icon}} plugin.so
+          files: info.json ${{needs.check.outputs.icon}} plugin.so models RapidOcrOnnx
           dest: ${{needs.check.outputs.name}}.potext
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3

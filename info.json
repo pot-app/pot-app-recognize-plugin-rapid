@@ -1,10 +1,10 @@
 {
-  "id": "[plugin].com.pot-app.ocrspace",
+  "id": "[plugin].com.pot-app.rapid",
   "plugin_type": "recognize",
   "icon": "icon.png",
-  "display": "OCR Space",
-  "homepage": "https://github.com/pot-app/pot-app-recognize-plugin-template",
-  "needs": [{ "key": "apikey", "display": "Api Key" }],
+  "display": "Rapid OCR",
+  "homepage": "https://github.com/pot-app/pot-app-recognize-plugin-rapid",
+  "needs": [],
   "language": {
     "auto": "",
     "zh_cn": "",
