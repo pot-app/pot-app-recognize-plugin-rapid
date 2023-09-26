@@ -21,13 +21,17 @@ pub fn recognize(
     let rapid_exe_path = plugin_path.join("RapidOcrOnnx");
     #[cfg(target_os = "windows")]
     let rapid_exe_path = plugin_path.join("RapidOcrOnnx.exe");
-
+    #[cfg(not(target_os = "windows"))]
+    std::process::Command::new("chmod")
+        .arg("+x")
+        .arg(&rapid_exe_path)
+        .output()?;
     let cache_dir_path = cache_dir().unwrap();
     let image_path = cache_dir_path
         .join("com.pot-app.desktop")
         .join("pot_screenshot_cut.png");
     let thread_num = get();
-    let output = std::process::Command::new(rapid_exe_path)
+    let output = std::process::Command::new(&rapid_exe_path)
         .current_dir(plugin_path)
         .args([
             "--models",
