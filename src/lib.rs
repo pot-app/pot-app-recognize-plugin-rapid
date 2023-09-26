@@ -10,7 +10,7 @@ use std::process::Command;
 #[no_mangle]
 pub fn recognize(
     _base64: &str,
-    _lang: &str,
+    lang: &str,
     _needs: HashMap<String, String>,
 ) -> Result<Value, Box<dyn Error>> {
     let config_dir_path = config_dir().unwrap();
@@ -50,13 +50,13 @@ pub fn recognize(
             "--models",
             "models",
             "--det",
-            "ch_PP-OCRv4_det_infer.onnx",
+            "ch_PP-OCR_det_infer.onnx",
             "--cls",
             "ch_ppocr_mobile_v2.0_cls_infer.onnx",
             "--rec",
-            "ch_PP-OCRv4_rec_infer.onnx",
+            &format!("{lang}_PP-OCR_rec_infer.onnx"),
             "--keys",
-            "ppocr_keys_v1.txt",
+            &format!("{lang}_dict.txt"),
             "--image",
             image_path.to_str().unwrap(),
             "--numThread",
@@ -98,7 +98,7 @@ mod tests {
     #[test]
     fn try_request() {
         let needs = HashMap::new();
-        let result = recognize("", "", needs);
+        let result = recognize("", "ch", needs);
         println!("{result:?}");
     }
 }
